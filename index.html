@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>For You ❤️</title>
+<style>
+body{
+  margin:0;
+  background:linear-gradient(#ff9a9e,#fad0c4);
+  font-family:'Segoe UI',sans-serif;
+  overflow:hidden;
+  text-align:center;
+}
+.screen{
+  display:none;
+  height:100vh;
+  justify-content:center;
+  align-items:center;
+  flex-direction:column;
+}
+.show{display:flex;}
+button{
+  padding:12px 30px;
+  font-size:18px;
+  border:none;
+  border-radius:25px;
+  cursor:pointer;
+}
+#noBtn{position:absolute;}
+video,img{
+  width:90%;
+  max-height:70vh;
+}
+.typing{
+  font-size:18px;
+  color:#4a0033;
+  width:90%;
+}
+.blink::after{
+  content:".";
+  animation:blink 1s infinite;
+}
+@keyframes blink{
+  0%{opacity:0;}
+  50%{opacity:1;}
+  100%{opacity:0;}
+}
+</style>
+</head>
+
+<body>
+
+<!-- SCREEN 1 -->
+<div class="screen show" id="s1">
+  <h2>Will you stay till the end? 💖</h2>
+  <button onclick="yesClick()">YES</button>
+  <button id="noBtn" onclick="moveNo()">NO</button>
+</div>
+
+<!-- SCREEN 2 -->
+<div class="screen" id="s2">
+  <h1 id="dropText"></h1>
+</div>
+
+<!-- VIDEO 1 -->
+<div class="screen" id="s3">
+  <video src="video1.mp4" autoplay></video>
+</div>
+
+<!-- TEXT -->
+<div class="screen" id="s4">
+  <div class="typing" id="typing"></div>
+</div>
+
+<!-- VIDEO 2 -->
+<div class="screen" id="s5">
+  <video src="video2.mp4" autoplay></video>
+</div>
+
+<!-- LOADING -->
+<div class="screen" id="s6">
+  <h2>Loading<span class="blink"></span></h2>
+</div>
+
+<!-- PHOTO -->
+<div class="screen" id="s7">
+  <img src="photo.jpg">
+</div>
+
+<audio id="bgm" src="bg.mp3"></audio>
+<audio id="final" src="final.mp3"></audio>
+
+<script>
+let noCount=0;
+
+function moveNo(){
+  noCount++;
+  if(noCount>=6){
+    document.getElementById("noBtn").style.display="none";
+    return;
+  }
+  noBtn.style.left=Math.random()*80+"%";
+  noBtn.style.top=Math.random()*80+"%";
+}
+
+function yesClick(){
+  bgm.play();
+  show(2);
+  dropText("Happy Valentine's Day ❤️",()=> {
+    setTimeout(()=>show(3),3000);
+  });
+}
+
+function dropText(text,done){
+  let i=0;
+  let el=document.getElementById("dropText");
+  el.innerHTML="";
+  let int=setInterval(()=>{
+    el.innerHTML+=text[i];
+    i++;
+    if(i>=text.length){
+      clearInterval(int);
+      done();
+    }
+  },150);
+}
+
+function show(n){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('show'));
+  document.getElementById("s"+n).classList.add('show');
+
+  if(n==3){
+    setTimeout(()=>show(4),10000);
+  }
+  if(n==4){
+    typeLines([
+      "This was not easy for me...",
+      "But every word here is real...",
+      "You are someone special 💕"
+    ],()=>show(5));
+  }
+  if(n==5){
+    bgm.pause();
+    setTimeout(()=>show(6),8000);
+  }
+  if(n==6){
+    setTimeout(()=>{show(7);final.play();},4000);
+  }
+}
+
+function typeLines(lines,done){
+  let i=0,j=0;
+  let el=document.getElementById("typing");
+  el.innerHTML="";
+  let int=setInterval(()=>{
+    el.innerHTML+=lines[i][j];
+    j++;
+    if(j>=lines[i].length){
+      el.innerHTML+="<br><br>";
+      i++;j=0;
+      if(i>=lines.length){
+        clearInterval(int);
+        done();
+      }
+    }
+  },50);
+}
+</script>
+
+</body>
+</html>
