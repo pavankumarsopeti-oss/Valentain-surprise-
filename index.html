@@ -53,9 +53,13 @@ video,img{
 <!-- SCREEN 1 -->
 <div class="screen show" id="s1">
   <h2>Will you stay till the end? 💖</h2>
-  <button onclick="yesClick()">YES</button>
-  <button id="noBtn" onclick="moveNo()">NO</button>
+
+  <div id="btnBox">
+    <button id="yesBtn" onclick="yesClick()">YES</button>
+    <button id="noBtn" onclick="moveNo()">NO</button>
+  </div>
 </div>
+
 
 <!-- SCREEN 2 -->
 <div class="screen" id="s2">
@@ -99,9 +103,13 @@ function moveNo(){
     document.getElementById("noBtn").style.display="none";
     return;
   }
-  noBtn.style.left=Math.random()*80+"%";
-  noBtn.style.top=Math.random()*80+"%";
+
+  let x = Math.random()*200 - 100;
+  let y = Math.random()*100 - 50;
+
+  noBtn.style.transform = `translate(${x}px, ${y}px)`;
 }
+
 
 function yesClick(){
   bgm.play();
