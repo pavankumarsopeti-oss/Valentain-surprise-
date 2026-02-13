@@ -118,16 +118,25 @@ let noCount=0;
 
 function moveNo(){
   noCount++;
-  if(noCount>=6){
-    document.getElementById("noBtn").style.display="none";
+
+  if(noCount >= 6){
+    noBtn.style.display = "none";
     return;
   }
-  noBtn.style.left=Math.random()*80+"%";
-  noBtn.style.top=Math.random()*80+"%";
+
+  const padding = 20; // screen edge nundi safe gap
+
+  const maxX = window.innerWidth - noBtn.offsetWidth - padding;
+  const maxY = window.innerHeight - noBtn.offsetHeight - padding;
+
+  // FULL SCREEN RANDOM POSITION
+  const x = Math.random() * maxX;
+  const y = Math.random() * maxY;
+
+  noBtn.style.position = "fixed";
+  noBtn.style.left = x + "px";
+  noBtn.style.top  = y + "px";
 }
-
-
-
 
 function yesClick(){
   bgm.play();
