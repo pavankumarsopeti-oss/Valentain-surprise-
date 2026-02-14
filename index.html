@@ -95,10 +95,11 @@ video,img{
   <div class="typing" id="typing"></div>
 </div>
 
-<!-- VIDEO 2 -->
+<!-- PHOTOS -->
 <div class="screen" id="s5">
-  <video src="video2.mp4" autoplay></video>
+  <img id="slideImg" src="photo1.jpg">
 </div>
+
 
 <!-- LOADING -->
 <div class="screen" id="s6">
@@ -175,9 +176,10 @@ function show(n){
     ],()=>show(5));
   }
   if(n==5){
-    bgm.pause();
-    setTimeout(()=>show(6),8000);
-  }
+  bgm.pause();
+  startPhotos();
+}
+
   if(n==6){
     setTimeout(()=>{show(7);final.play();},4000);
   }
@@ -200,6 +202,32 @@ function typeLines(lines,done){
     }
   },50);
 }
+
+  let photos = [
+  "photo1.jpg",
+  "photo2.jpg",
+  "photo3.jpg",
+  "photo4.jpg",
+  "photo5.jpg",
+  "photo6.jpg",
+  "photo7.jpg"
+];
+
+let pIndex = 0;
+
+function startPhotos(){
+  let img = document.getElementById("slideImg");
+  let interval = setInterval(()=>{
+    pIndex++;
+    if(pIndex >= photos.length){
+      clearInterval(interval);
+      setTimeout(()=>show(6),2000); // next screen
+      return;
+    }
+    img.src = photos[pIndex];
+  },2000); // 2 sec per photo
+}
+
 </script>
 
 </body>
