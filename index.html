@@ -106,8 +106,8 @@ img,video{
 
 </div>
 
-<audio id="bgm" src="bgm.mp3" loop></audio>
-<audio id="final" src="final.mp3"></audio>
+<audio id="bgm" src="bgm.mp3" loop preload="auto"></audio>
+<audio id="final" src="final.mp3" preload="auto"></audio>
 
 <script>
 const yes=document.getElementById("yes");
@@ -128,20 +128,29 @@ no.onmouseover=()=>{
 };
 
 /* YES CLICK */
-yes.onclick=()=>{
+yes.onclick = () => {
+
+  // hide first screen
   document.getElementById("step0").classList.add("hidden");
 
-  /* ✅ FORCE BGM PLAY (FIX) */
-  bgm.volume=0.7;
-  bgm.currentTime=0;
-  bgm.play();
+  // 🔥 AUDIO FORCE PLAY FIX
+  bgm.muted = true;
+  bgm.currentTime = 0;
 
+  bgm.play().then(()=>{
+    // unmute after start
+    bgm.muted = false;
+  }).catch(e=>{
+    console.log("Audio blocked:", e);
+  });
+
+  // next flow
   showLine(
     "I just want you to see this once 💕",
     playVideo
   );
 };
-
+  
 /* SLOW TYPING FUNCTION */
 function showLine(text,done){
   document.getElementById("stepText").classList.remove("hidden");
