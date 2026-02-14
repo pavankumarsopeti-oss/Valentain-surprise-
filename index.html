@@ -217,16 +217,32 @@ let pIndex = 0;
 
 function startPhotos(){
   let img = document.getElementById("slideImg");
+  pIndex = 0;
+
   let interval = setInterval(()=>{
-    pIndex++;
-    if(pIndex >= photos.length){
+    img.src = photos[pIndex];
+
+    if(pIndex === photos.length - 1){
+      // LAST PHOTO REACHED
       clearInterval(interval);
-      setTimeout(()=>show(6),2000); // next screen
+
+      // BACKGROUND SONG STOP
+      bgm.pause();
+      bgm.currentTime = 0;
+
+      // NEXT SCREEN AFTER 2 SEC
+      setTimeout(()=>show(6),2000);
       return;
     }
-    img.src = photos[pIndex];
+
+    pIndex++;
   },2000); // 2 sec per photo
 }
+
+// EXTRA TIP: final song complete ayyaka auto stop (safe side)
+final.onended = () => {
+  final.currentTime = 0;
+};
 
 </script>
 
