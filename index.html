@@ -3,6 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <title>For You ❤️</title>
+
 <style>
 body{
   margin:0;
@@ -19,6 +20,7 @@ body{
   flex-direction:column;
 }
 .show{display:flex;}
+
 button{
   padding:12px 30px;
   font-size:18px;
@@ -26,16 +28,21 @@ button{
   border-radius:25px;
   cursor:pointer;
 }
-#noBtn{position:absolute;}
-video,img{
+
+#btnBox{
+  display:flex;
+  gap:25px;
+  margin-top:20px;
+}
+
+#yesBtn{background:#ff4d6d;color:white;}
+#noBtn{background:#999;color:white;position:absolute;}
+
+img{
   width:90%;
   max-height:70vh;
 }
-.typing{
-  font-size:18px;
-  color:#4a0033;
-  width:90%;
-}
+
 .blink::after{
   content:".";
   animation:blink 1s infinite;
@@ -45,25 +52,6 @@ video,img{
   50%{opacity:1;}
   100%{opacity:0;}
 }
-
-  #btnBox{
-  display:flex;
-  justify-content:center;
-  gap:25px;
-  margin-top:20px;
-}
-
-#yesBtn{
-  background:#ff4d6d;
-  color:white;
-}
-
-#noBtn{
-  background:#999;
-  color:white;
-  position:relative;
-}
-  
 </style>
 </head>
 
@@ -72,42 +60,34 @@ video,img{
 <!-- SCREEN 1 -->
 <div class="screen show" id="s1">
   <h2>Will you stay till the end? 💖</h2>
-
   <div id="btnBox">
     <button id="yesBtn" onclick="yesClick()">YES</button>
     <button id="noBtn" onclick="moveNo()">NO</button>
   </div>
 </div>
 
-
-<!-- SCREEN 2 -->
+<!-- LINE 1 -->
 <div class="screen" id="s2">
-  <h1 id="dropText"></h1>
-</div>
-
-<!-- VIDEO 1 -->
-<div class="screen" id="s3">
-  <video src="video1.mp4" autoplay></video>
-</div>
-
-<!-- TEXT -->
-<div class="screen" id="s4">
-  <div class="typing" id="typing"></div>
+  <h2>You mean a lot to me ❤️</h2>
 </div>
 
 <!-- PHOTOS -->
-<div class="screen" id="s5">
+<div class="screen" id="s3">
   <img id="slideImg" src="photo1.jpg">
 </div>
 
+<!-- LINE 2 -->
+<div class="screen" id="s4">
+  <h2>This is just for you 💕</h2>
+</div>
 
 <!-- LOADING -->
-<div class="screen" id="s6">
+<div class="screen" id="s5">
   <h2>Loading<span class="blink"></span></h2>
 </div>
 
-<!-- PHOTO -->
-<div class="screen" id="s7">
+<!-- FINAL PHOTO -->
+<div class="screen" id="s6">
   <img src="lastphoto.jpg">
 </div>
 
@@ -119,131 +99,59 @@ let noCount=0;
 
 function moveNo(){
   noCount++;
-
-  if(noCount >= 6){
-    noBtn.style.display = "none";
+  if(noCount>=6){
+    noBtn.style.display="none";
     return;
   }
-
-  const padding = 20; // screen edge nundi safe gap
-
-  const maxX = window.innerWidth - noBtn.offsetWidth - padding;
-  const maxY = window.innerHeight - noBtn.offsetHeight - padding;
-
-  // FULL SCREEN RANDOM POSITION
-  const x = Math.random() * maxX;
-  const y = Math.random() * maxY;
-
-  noBtn.style.position = "fixed";
-  noBtn.style.left = x + "px";
-  noBtn.style.top  = y + "px";
+  noBtn.style.position="fixed";
+  noBtn.style.left=Math.random()*(window.innerWidth-80)+"px";
+  noBtn.style.top=Math.random()*(window.innerHeight-40)+"px";
 }
 
 function yesClick(){
+  bgm.currentTime=0;
   bgm.play();
   show(2);
-  dropText("Happy Valentine's Day ❤️",()=> {
-    setTimeout(()=>show(3),3000);
-  });
+  setTimeout(()=>show(3),2500);
 }
 
-function dropText(text,done){
-  let i=0;
-  let el=document.getElementById("dropText");
-  el.innerHTML="";
-  let int=setInterval(()=>{
-    el.innerHTML+=text[i];
-    i++;
-    if(i>=text.length){
-      clearInterval(int);
-      done();
+let photos=[
+ "photo1.jpg","photo2.jpg","photo3.jpg",
+ "photo4.jpg","photo5.jpg","photo6.jpg","photo7.jpg"
+];
+let pIndex=0;
+
+function startPhotos(){
+  let img=document.getElementById("slideImg");
+  pIndex=0;
+  let interval=setInterval(()=>{
+    img.src=photos[pIndex];
+    if(pIndex===photos.length-1){
+      clearInterval(interval);
+      bgm.pause();
+      bgm.currentTime=0;
+      setTimeout(()=>show(4),2000);
+      return;
     }
-  },150);
+    pIndex++;
+  },2000);
 }
 
 function show(n){
   document.querySelectorAll('.screen').forEach(s=>s.classList.remove('show'));
   document.getElementById("s"+n).classList.add('show');
 
-  if(n==3){
-    setTimeout(()=>show(4),10000);
-  }
-  if(n==4){
-    typeLines([
-      "This was not easy for me...",
-      "But every word here is real...",
-      "You are someone special 💕"
-    ],()=>show(5));
-  }
-  if(n==5){
-  bgm.pause();
-  startPhotos();
-}
-
-  if(n==6){
-    setTimeout(()=>{show(7);final.play();},4000);
+  if(n===3) startPhotos();
+  if(n===4) setTimeout(()=>show(5),2500);
+  if(n===5){
+    setTimeout(()=>{
+      show(6);
+      final.currentTime=0;
+      final.play();
+      setTimeout(()=>final.pause(),5000);
+    },3000);
   }
 }
-
-function typeLines(lines,done){
-  let i=0,j=0;
-  let el=document.getElementById("typing");
-  el.innerHTML="";
-  let int=setInterval(()=>{
-    el.innerHTML+=lines[i][j];
-    j++;
-    if(j>=lines[i].length){
-      el.innerHTML+="<br><br>";
-      i++;j=0;
-      if(i>=lines.length){
-        clearInterval(int);
-        done();
-      }
-    }
-  },50);
-}
-
-  let photos = [
-  "photo1.jpg",
-  "photo2.jpg",
-  "photo3.jpg",
-  "photo4.jpg",
-  "photo5.jpg",
-  "photo6.jpg",
-  "photo7.jpg"
-];
-
-let pIndex = 0;
-
-function startPhotos(){
-  let img = document.getElementById("slideImg");
-  pIndex = 0;
-
-  let interval = setInterval(()=>{
-    img.src = photos[pIndex];
-
-    if(pIndex === photos.length - 1){
-      // LAST PHOTO REACHED
-      clearInterval(interval);
-
-      // BACKGROUND SONG STOP
-      bgm.pause();
-      bgm.currentTime = 0;
-
-      // NEXT SCREEN AFTER 2 SEC
-      setTimeout(()=>show(6),2000);
-      return;
-    }
-
-    pIndex++;
-  },2000); // 2 sec per photo
-}
-
-// EXTRA TIP: final song complete ayyaka auto stop (safe side)
-final.onended = () => {
-  final.currentTime = 0;
-};
-
 </script>
 
 </body>
