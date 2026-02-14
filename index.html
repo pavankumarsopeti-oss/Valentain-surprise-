@@ -2,7 +2,7 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<title>For You 💖</title>
+<title>For You ❤️</title>
 
 <style>
 body{
@@ -10,26 +10,27 @@ body{
   height:100vh;
   background:linear-gradient(135deg,#ff9a9e,#fad0c4);
   font-family:'Segoe UI',sans-serif;
+  overflow:hidden;
   display:flex;
   justify-content:center;
   align-items:center;
   text-align:center;
-  overflow:hidden;
 }
 
-.container{width:100%;position:relative;z-index:2;}
+/* CONTENT */
+.box{width:100%;position:relative;z-index:2;}
 
 button{
-  padding:12px 30px;
+  padding:12px 32px;
   font-size:18px;
   border:none;
   border-radius:25px;
   cursor:pointer;
 }
 
-#yes{background:#ff4081;color:white;}
+#yes{background:#ff3f7f;color:white;}
 #no{
-  background:#555;
+  background:#666;
   color:white;
   position:absolute;
 }
@@ -42,16 +43,26 @@ img,video{
   box-shadow:0 10px 30px rgba(0,0,0,0.3);
 }
 
-#typing{font-size:22px;line-height:1.6;color:#4a0033;}
-#loading{font-size:26px;color:#4a0033;}
+/* TEXT */
+#typing{
+  font-size:22px;
+  line-height:1.8;
+  color:#3b001f;   /* ✅ DARK TEXT */
+  padding:20px;
+}
 
-/* ❤️ FLOATING HEARTS */
+/* LOADING */
+#loading{
+  font-size:26px;
+  color:#3b001f;
+}
+
+/* FLOATING HEARTS */
 .heart{
   position:absolute;
   bottom:-20px;
-  font-size:20px;
   animation:float 8s linear infinite;
-  opacity:0.7;
+  opacity:0.6;
   z-index:1;
 }
 @keyframes float{
@@ -64,17 +75,17 @@ img,video{
 
 <body>
 
-<div class="container">
+<div class="box">
 
   <!-- STEP 0 -->
   <div id="step0">
-    <h2>Will you be my Valentine? 💕</h2>
+    <h2>Will you stay till the end? 💖</h2>
     <button id="yes">YES</button>
     <button id="no">NO</button>
   </div>
 
   <!-- TEXT -->
-  <div id="step1" class="hidden">
+  <div id="stepText" class="hidden">
     <div id="typing"></div>
   </div>
 
@@ -99,62 +110,73 @@ img,video{
 <audio id="final" src="final.mp3"></audio>
 
 <script>
-let photos=[
-  "photo1.jpg","photo2.jpg","photo3.jpg",
-  "photo4.jpg","photo5.jpg","photo6.jpg","photo7.jpg"
-];
-let p=0;
-
 const yes=document.getElementById("yes");
 const no=document.getElementById("no");
 const bgm=document.getElementById("bgm");
 const final=document.getElementById("final");
 
+let photos=[
+ "photo1.jpg","photo2.jpg","photo3.jpg",
+ "photo4.jpg","photo5.jpg","photo6.jpg","photo7.jpg"
+];
+let p=0;
+
+/* NO BUTTON JUMP */
+no.onmouseover=()=>{
+  no.style.left=Math.random()*(window.innerWidth-120)+"px";
+  no.style.top=Math.random()*(window.innerHeight-60)+"px";
+};
+
+/* YES CLICK */
 yes.onclick=()=>{
   document.getElementById("step0").classList.add("hidden");
 
-  // ✅ FIXED: bgm force play
-  bgm.volume=0.6;
-  bgm.play().catch(()=>{});
+  /* ✅ FORCE BGM PLAY (FIX) */
+  bgm.volume=0.7;
+  bgm.currentTime=0;
+  bgm.play();
 
-  showLine("HAPPY ANNIVERSARY RA ♥️",playVideo);
+  showLine(
+    "I just want you to see this once 💕",
+    playVideo
+  );
 };
 
-no.onmouseover=()=>{
-  let x=Math.random()*(window.innerWidth-120);
-  let y=Math.random()*(window.innerHeight-60);
-  no.style.left=x+"px";
-  no.style.top=y+"px";
-};
-
+/* SLOW TYPING FUNCTION */
 function showLine(text,done){
-  document.getElementById("step1").classList.remove("hidden");
+  document.getElementById("stepText").classList.remove("hidden");
   let el=document.getElementById("typing");
   el.innerHTML="";
   let i=0;
+
   let t=setInterval(()=>{
-    el.innerHTML+=text[i++];
+    el.innerHTML+=text[i];
+    i++;
     if(i>=text.length){
       clearInterval(t);
-      setTimeout(done,2000);
+      setTimeout(done,2500);
     }
-  },45);
+  },90);   // ✅ SLOW SPEED
 }
 
+/* VIDEO */
 function playVideo(){
-  document.getElementById("step1").classList.add("hidden");
+  document.getElementById("stepText").classList.add("hidden");
   let v=document.getElementById("vid");
   document.getElementById("videoBox").classList.remove("hidden");
+  v.currentTime=0;
   v.play();
+
   v.onended=()=>{
     document.getElementById("videoBox").classList.add("hidden");
     longLines();
   };
 }
 
+/* LONG LINES */
 function longLines(){
   let lines=[
-    "156 week's back same day I met this idiot😚🤭...",
+     "156 week's back same day I met this idiot😚🤭...",
 "Our journey is unbelievable becoz destiny plan's our journey💌🫶🏻 ...",
 "In this 36 months we understand each other's👊🏻💟 understand me lots but this pandhi...",
 "1095 day's have been completed but every second intimates aa pandhiii is Waiting for me🐷😂...",
@@ -170,76 +192,86 @@ function longLines(){
 }
 
 function typeLines(lines,done){
-  document.getElementById("step1").classList.remove("hidden");
+  document.getElementById("stepText").classList.remove("hidden");
   let el=document.getElementById("typing");
   el.innerHTML="";
   let i=0,j=0;
+
   let int=setInterval(()=>{
-    el.innerHTML+=lines[i][j++];
+    el.innerHTML+=lines[i][j];
+    j++;
     if(j>=lines[i].length){
       el.innerHTML+="<br><br>";
-      i++;j=0;
+      i++; j=0;
       if(i>=lines.length){
         clearInterval(int);
-        setTimeout(done,2000);
+        setTimeout(done,3000);
       }
     }
-  },40);
+  },80);   // ✅ SLOW & SMOOTH
 }
 
+/* PHOTOS */
 function showPhotos(){
-  document.getElementById("step1").classList.add("hidden");
+  document.getElementById("stepText").classList.add("hidden");
   document.getElementById("photoBox").classList.remove("hidden");
   let img=document.getElementById("photo");
-  img.src=photos[p++];
-  let interval=setInterval(()=>{
+  p=0;
+  img.src=photos[p];
+
+  let inter=setInterval(()=>{
+    p++;
     if(p>=photos.length){
-      clearInterval(interval);
-      document.getElementById("photoBox").classList.add("hidden");
+      clearInterval(inter);
       finalLine();
     }else{
-      img.src=photos[p++];
+      img.src=photos[p];
     }
-  },2000);
+  },2200);
 }
 
+/* FINAL LINE */
 function finalLine(){
-  showLine("One last thing... ❤️",showLoading);
+  showLine("One last thing for you... ❤️",showLoading);
 }
 
+/* LOADING */
 function showLoading(){
-  document.getElementById("step1").classList.add("hidden");
+  document.getElementById("stepText").classList.add("hidden");
   document.getElementById("loadingBox").classList.remove("hidden");
+
   setTimeout(()=>{
     document.getElementById("loadingBox").classList.add("hidden");
     lastScene();
   },3000);
 }
 
+/* LAST PHOTO + FINAL AUDIO */
 function lastScene(){
   let img=document.getElementById("photo");
   img.src="last.jpg";
   document.getElementById("photoBox").classList.remove("hidden");
 
+  /* ✅ BGM STOP, FINAL START */
   bgm.pause();
+  final.currentTime=0;
   final.play();
 
-  // ✅ FIXED: final audio ayyaka photo kuda hide
   final.onended=()=>{
     document.getElementById("photoBox").classList.add("hidden");
   };
 }
 
-/* ❤️ Floating hearts generator */
+/* FLOATING HEARTS */
 setInterval(()=>{
   let h=document.createElement("div");
   h.className="heart";
   h.innerHTML="💖";
   h.style.left=Math.random()*100+"vw";
-  h.style.fontSize=(15+Math.random()*15)+"px";
+  h.style.fontSize=(14+Math.random()*16)+"px";
   document.body.appendChild(h);
   setTimeout(()=>h.remove(),8000);
-},600);
+},700);
 </script>
 
 </body>
