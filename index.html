@@ -1,263 +1,242 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>For You ❤️</title>
+<title>For You 💖</title>
 
 <style>
-*{margin:0;padding:0;box-sizing:border-box;}
-
 body{
-  width:100vw;
+  margin:0;
   height:100vh;
-  font-family:Segoe UI,sans-serif;
   background:linear-gradient(135deg,#ff9a9e,#fad0c4);
-  overflow:hidden;
-  position:relative;
-}
-
-/* COMMON SCREEN */
-.screen{
-  width:100%;
-  height:100%;
+  font-family:'Segoe UI',sans-serif;
   display:flex;
   justify-content:center;
   align-items:center;
-  flex-direction:column;
   text-align:center;
-  z-index:2;
+  overflow:hidden;
 }
 
-.hidden{display:none;}
-
-/* TEXT – ZOOM TAGGINCHAM */
-#typing{
-  font-size:18px;        /* 🔽 reduced */
-  line-height:1.6;
-  color:#3b001f;
-  max-width:90%;
-}
-
-/* BUTTONS */
-.btn-row{
-  display:flex;
-  gap:25px;
-  margin-top:20px;
-}
+.container{width:100%;position:relative;z-index:2;}
 
 button{
-  padding:12px 32px;
-  font-size:17px;
+  padding:12px 30px;
+  font-size:18px;
   border:none;
-  border-radius:30px;
+  border-radius:25px;
   cursor:pointer;
 }
 
-#yes{background:#ff3f7f;color:white;}
-
+#yes{background:#ff4081;color:white;}
 #no{
   background:#555;
   color:white;
   position:absolute;
 }
 
-/* VIDEO & IMAGE – NO ZOOM */
-video,img{
-  width:100vw;
-  height:100vh;
-  object-fit:contain;   /* ❌ NO ZOOM */
-  background:black;
+.hidden{display:none;}
+
+img,video{
+  max-width:80%;
+  border-radius:15px;
+  box-shadow:0 10px 30px rgba(0,0,0,0.3);
 }
 
-/* LOADING */
-#loading{
-  font-size:22px;
-  color:#3b001f;
-}
+#typing{font-size:22px;line-height:1.6;color:#4a0033;}
+#loading{font-size:26px;color:#4a0033;}
 
-/* FLOATING HEARTS */
+/* ❤️ FLOATING HEARTS */
 .heart{
   position:absolute;
   bottom:-20px;
-  font-size:18px;
-  animation:floatUp 8s linear forwards;
-  opacity:0.6;
+  font-size:20px;
+  animation:float 8s linear infinite;
+  opacity:0.7;
   z-index:1;
 }
-
-@keyframes floatUp{
-  from{transform:translateY(0);opacity:0;}
+@keyframes float{
+  0%{transform:translateY(0);opacity:0;}
   10%{opacity:1;}
-  to{transform:translateY(-120vh);opacity:0;}
+  100%{transform:translateY(-110vh);opacity:0;}
 }
 </style>
 </head>
 
 <body>
 
-<!-- STEP 1 -->
-<div id="step0" class="screen">
-  <h2>This is just for you 💖</h2>
-  <div class="btn-row">
+<div class="container">
+
+  <!-- STEP 0 -->
+  <div id="step0">
+    <h2>Will you be my Valentine? 💕</h2>
     <button id="yes">YES</button>
     <button id="no">NO</button>
   </div>
+
+  <!-- TEXT -->
+  <div id="step1" class="hidden">
+    <div id="typing"></div>
+  </div>
+
+  <!-- VIDEO -->
+  <div id="videoBox" class="hidden">
+    <video id="vid" src="video.mp4"></video>
+  </div>
+
+  <!-- PHOTOS -->
+  <div id="photoBox" class="hidden">
+    <img id="photo">
+  </div>
+
+  <!-- LOADING -->
+  <div id="loadingBox" class="hidden">
+    <div id="loading">Loading...</div>
+  </div>
+
 </div>
 
-<!-- TEXT -->
-<div id="textScreen" class="screen hidden">
-  <div id="typing"></div>
-</div>
-
-<!-- VIDEO -->
-<div id="videoScreen" class="hidden">
-  <video id="vid" src="video.mp4"></video>
-</div>
-
-<!-- PHOTOS -->
-<div id="photoScreen" class="hidden">
-  <img id="photo">
-</div>
-
-<!-- LOADING -->
-<div id="loadingScreen" class="screen hidden">
-  <div id="loading">Loading...</div>
-</div>
-
-<audio id="bgm" src="bgm.mp3" loop preload="auto"></audio>
-<audio id="final" src="final.mp3" preload="auto"></audio>
+<audio id="bgm" src="bgm.mp3" loop></audio>
+<audio id="final" src="final.mp3"></audio>
 
 <script>
+let photos=[
+  "photo1.jpg","photo2.jpg","photo3.jpg",
+  "photo4.jpg","photo5.jpg","photo6.jpg","photo7.jpg"
+];
+let p=0;
+
 const yes=document.getElementById("yes");
 const no=document.getElementById("no");
 const bgm=document.getElementById("bgm");
 const final=document.getElementById("final");
-const vid=document.getElementById("vid");
-const typing=document.getElementById("typing");
 
-let photos=[
- "photo1.jpg","photo2.jpg","photo3.jpg",
- "photo4.jpg","photo5.jpg","photo6.jpg","photo7.jpg"
-];
-
-/* NO BUTTON JUMP – FULL SCREEN */
-function jumpNo(){
-  no.style.left=Math.random()*(window.innerWidth-100)+"px";
-  no.style.top =Math.random()*(window.innerHeight-60)+"px";
-}
-no.addEventListener("mouseenter",jumpNo);
-no.addEventListener("touchstart",jumpNo);
-
-/* YES CLICK */
 yes.onclick=()=>{
   document.getElementById("step0").classList.add("hidden");
-  bgm.currentTime=0;
-  bgm.play();
-  showLine("I just want you to see this once 💕",playVideo);
+
+  // ✅ FIXED: bgm force play
+  bgm.volume=0.6;
+  bgm.play().catch(()=>{});
+
+  showLine("HAPPY ANNIVERSARY RA ♥️",playVideo);
 };
 
-/* SINGLE LINE */
-function showLine(text,next){
-  document.getElementById("textScreen").classList.remove("hidden");
-  typing.innerHTML="";
+no.onmouseover=()=>{
+  let x=Math.random()*(window.innerWidth-120);
+  let y=Math.random()*(window.innerHeight-60);
+  no.style.left=x+"px";
+  no.style.top=y+"px";
+};
+
+function showLine(text,done){
+  document.getElementById("step1").classList.remove("hidden");
+  let el=document.getElementById("typing");
+  el.innerHTML="";
   let i=0;
   let t=setInterval(()=>{
-    typing.innerHTML+=text[i++];
+    el.innerHTML+=text[i++];
     if(i>=text.length){
       clearInterval(t);
-      setTimeout(next,2000);
+      setTimeout(done,2000);
     }
-  },100);
+  },45);
 }
 
-/* VIDEO */
 function playVideo(){
-  document.getElementById("textScreen").classList.add("hidden");
-  document.getElementById("videoScreen").classList.remove("hidden");
-  vid.currentTime=0;
-  vid.play();
-  vid.onended=()=>{
-    document.getElementById("videoScreen").classList.add("hidden");
+  document.getElementById("step1").classList.add("hidden");
+  let v=document.getElementById("vid");
+  document.getElementById("videoBox").classList.remove("hidden");
+  v.play();
+  v.onended=()=>{
+    document.getElementById("videoBox").classList.add("hidden");
     longLines();
   };
 }
 
-/* MULTI LINES */
 function longLines(){
   let lines=[
-    "156 weeks ago everything started ❤️",
-    "36 months of memories 💕",
-    "Every day choosing you ✨",
-    "You became my comfort 💖",
-    "Forever kind of feeling ♾️"
+    "156 week's back same day I met this idiot😚🤭...",
+"Our journey is unbelievable becoz destiny plan's our journey💌🫶🏻 ...",
+"In this 36 months we understand each other's👊🏻💟 understand me lots but this pandhi...",
+"1095 day's have been completed but every second intimates aa pandhiii is Waiting for me🐷😂...",
+"Happy 3rd year anniversary♾️❤️...",
+"May be I'm not perfect for you but you always perfect for me pandu✨🩵",
+"This year 2026 we may not together to celebrate but trust me I'll be with you till our last anniversary in our life💕🧬...",
+"Thank you for coming into my life unexpectedly💟🥹...",
+"I already promised you I'll be your nothing🫳🏻💞",
+"May be I'm unlucky in everything but you succeed me in love🫶🏻💕",
+"I never want to loose you in any situation🫳🏻💌..."
   ];
   typeLines(lines,showPhotos);
 }
 
-function typeLines(lines,next){
-  document.getElementById("textScreen").classList.remove("hidden");
-  typing.innerHTML="";
+function typeLines(lines,done){
+  document.getElementById("step1").classList.remove("hidden");
+  let el=document.getElementById("typing");
+  el.innerHTML="";
   let i=0,j=0;
   let int=setInterval(()=>{
-    typing.innerHTML+=lines[i][j++];
+    el.innerHTML+=lines[i][j++];
     if(j>=lines[i].length){
-      typing.innerHTML+="<br><br>";
+      el.innerHTML+="<br><br>";
       i++;j=0;
       if(i>=lines.length){
         clearInterval(int);
-        setTimeout(next,2000);
+        setTimeout(done,2000);
       }
     }
-  },90);
+  },40);
 }
 
-/* PHOTOS */
 function showPhotos(){
-  document.getElementById("textScreen").classList.add("hidden");
-  document.getElementById("photoScreen").classList.remove("hidden");
+  document.getElementById("step1").classList.add("hidden");
+  document.getElementById("photoBox").classList.remove("hidden");
   let img=document.getElementById("photo");
-  let p=0;
-  img.src=photos[p];
-  let slide=setInterval(()=>{
-    p++;
+  img.src=photos[p++];
+  let interval=setInterval(()=>{
     if(p>=photos.length){
-      clearInterval(slide);
+      clearInterval(interval);
+      document.getElementById("photoBox").classList.add("hidden");
       finalLine();
-    }else img.src=photos[p];
+    }else{
+      img.src=photos[p++];
+    }
   },2000);
 }
 
-/* FINAL LINE */
 function finalLine(){
-  showLine("One last thing for you ❤️",showLoading);
+  showLine("One last thing... ❤️",showLoading);
 }
 
-/* LOADING */
 function showLoading(){
-  document.getElementById("photoScreen").classList.add("hidden");
-  document.getElementById("loadingScreen").classList.remove("hidden");
+  document.getElementById("step1").classList.add("hidden");
+  document.getElementById("loadingBox").classList.remove("hidden");
   setTimeout(()=>{
-    document.getElementById("loadingScreen").classList.add("hidden");
+    document.getElementById("loadingBox").classList.add("hidden");
     lastScene();
   },3000);
 }
 
-/* LAST PHOTO + AUDIO */
 function lastScene(){
-  document.getElementById("photoScreen").classList.remove("hidden");
-  document.getElementById("photo").src="last.jpg";
+  let img=document.getElementById("photo");
+  img.src="last.jpg";
+  document.getElementById("photoBox").classList.remove("hidden");
+
   bgm.pause();
-  final.currentTime=0;
   final.play();
+
+  // ✅ FIXED: final audio ayyaka photo kuda hide
+  final.onended=()=>{
+    document.getElementById("photoBox").classList.add("hidden");
+  };
 }
 
-/* FLOATING HEARTS */
+/* ❤️ Floating hearts generator */
 setInterval(()=>{
   let h=document.createElement("div");
   h.className="heart";
-  h.innerText="💖";
+  h.innerHTML="💖";
   h.style.left=Math.random()*100+"vw";
+  h.style.fontSize=(15+Math.random()*15)+"px";
   document.body.appendChild(h);
   setTimeout(()=>h.remove(),8000);
 },600);
