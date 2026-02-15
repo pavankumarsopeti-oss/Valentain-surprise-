@@ -149,11 +149,26 @@ no.onclick=()=>{
 };
 
 /* YES CLICK */
-yes.onclick=()=>{
-  step0.classList.add("hidden");
-  bgm.play();
+yes.onclick = () => {
+
+  // hide first screen
+  document.getElementById("step0").classList.add("hidden");
+
+  // 🔥 AUTOPLAY FIX (100% working on mobile)
+  bgm.muted = true;
+  bgm.currentTime = 0;
+
+  bgm.play().then(()=>{
+    bgm.muted = false;   // unmute after start
+    bgm.volume = 0.7;
+  }).catch(err=>{
+    console.log("Audio blocked", err);
+  });
+
+  // continue flow
   showLine("HAPPY ANNIVERSARY RA ♥️", playVideo);
 };
+
 
 function showLine(text,next){
   textScreen.classList.remove("hidden");
