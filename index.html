@@ -1,190 +1,179 @@
- <!DOCTYPE html>
-<html>
+<!DOCTYPE html>
+<html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>For You 💖</title>
 
 <style>
+*{margin:0;padding:0;box-sizing:border-box;}
+
 body{
-  margin:0;
+  width:100vw;
   height:100vh;
   background:linear-gradient(135deg,#ff9a9e,#fad0c4);
   font-family:'Segoe UI',sans-serif;
+  overflow:hidden;
+  position:relative;
+}
+
+/* BACKGROUND HEARTS */
+.heart{
+  position:absolute;
+  bottom:-20px;
+  font-size:18px;
+  opacity:0.6;
+  animation:float 8s linear forwards;
+  z-index:1;
+}
+@keyframes float{
+  from{transform:translateY(0);opacity:0;}
+  10%{opacity:1;}
+  to{transform:translateY(-120vh);opacity:0;}
+}
+
+/* COMMON SCREEN */
+.screen{
+  width:100%;
+  height:100%;
   display:flex;
   justify-content:center;
   align-items:center;
+  flex-direction:column;
   text-align:center;
-  overflow:hidden;
-}
-
-.container{
-  width:100%;
-  height:100%;
-  position:relative;
   z-index:2;
 }
+.hidden{display:none;}
 
-/* STEP 0 */
-#step0{
-  display:flex;
-  flex-direction:column;
-  align-items:center;
+/* TEXT */
+#typing{
+  font-size:18px;
+  line-height:1.6;
+  color:#3b001f;
+  max-width:90%;
 }
 
+/* BUTTONS */
 .btnRow{
   display:flex;
   gap:25px;
   margin-top:20px;
 }
-
 button{
-  padding:12px 30px;
-  font-size:18px;
+  padding:12px 32px;
+  font-size:17px;
   border:none;
-  border-radius:25px;
+  border-radius:30px;
   cursor:pointer;
 }
-
-#yes{background:#ff4081;color:white;}
+#yes{background:#ff3f7f;color:#fff;}
 #no{
   background:#555;
-  color:white;
-  position:fixed;   /* IMPORTANT for jumping */
+  color:#fff;
+  position:fixed; /* REQUIRED for jumping */
 }
-
-.hidden{display:none;}
 
 /* FULL SCREEN MEDIA – NO ZOOM */
-img,video{
+video,img{
   width:100vw;
   height:100vh;
-  object-fit:contain;   /* 🔥 no zoom, no cut */
+  object-fit:contain;   /* NO ZOOM / NO CUT */
   background:black;
-  border-radius:0;
-  box-shadow:none;
 }
 
-/* TEXT */
-#typing{
-  font-size:20px;
-  line-height:1.6;
-  color:#4a0033;
-  max-width:90%;
-  margin:auto;
-}
-
-#loading{font-size:26px;color:#4a0033;}
-
-/* ❤️ FLOATING HEARTS */
-.heart{
-  position:absolute;
-  bottom:-20px;
-  font-size:20px;
-  animation:float 8s linear infinite;
-  opacity:0.7;
-  z-index:1;
-}
-@keyframes float{
-  0%{transform:translateY(0);opacity:0;}
-  10%{opacity:1;}
-  100%{transform:translateY(-110vh);opacity:0;}
+/* LOADING */
+#loading{
+  font-size:22px;
+  color:#3b001f;
 }
 </style>
 </head>
 
 <body>
 
-<div class="container">
-
-  <!-- STEP 0 -->
-  <div id="step0">
-    <h2>Will you be my Valentine? 💕</h2>
-    <div class="btnRow">
-      <button id="yes">YES</button>
-      <button id="no">NO</button>
-    </div>
+<!-- STEP 1 -->
+<div id="step0" class="screen">
+  <h2>Will you stay till the end? 💕</h2>
+  <div class="btnRow">
+    <button id="yes">YES</button>
+    <button id="no">NO</button>
   </div>
-
-  <!-- TEXT -->
-  <div id="step1" class="hidden">
-    <div id="typing"></div>
-  </div>
-
-  <!-- VIDEO -->
-  <div id="videoBox" class="hidden">
-    <video id="vid" src="video.mp4"></video>
-  </div>
-
-  <!-- PHOTOS -->
-  <div id="photoBox" class="hidden">
-    <img id="photo">
-  </div>
-
-  <!-- LOADING -->
-  <div id="loadingBox" class="hidden">
-    <div id="loading">Loading...</div>
-  </div>
-
 </div>
 
-<audio id="bgm" src="bgm.mp3" loop></audio>
-<audio id="final" src="final.mp3"></audio>
+<!-- TEXT -->
+<div id="textScreen" class="screen hidden">
+  <div id="typing"></div>
+</div>
+
+<!-- VIDEO -->
+<div id="videoScreen" class="hidden">
+  <video id="vid" src="video.mp4"></video>
+</div>
+
+<!-- PHOTOS -->
+<div id="photoScreen" class="hidden">
+  <img id="photo">
+</div>
+
+<!-- LOADING -->
+<div id="loadingScreen" class="screen hidden">
+  <div id="loading">Loading...</div>
+</div>
+
+<audio id="bgm" src="bgm.mp3" loop preload="auto"></audio>
+<audio id="final" src="final.mp3" preload="auto"></audio>
 
 <script>
+const yes = document.getElementById("yes");
+const no  = document.getElementById("no");
+const bgm = document.getElementById("bgm");
+const final = document.getElementById("final");
+const typing = document.getElementById("typing");
+const vid = document.getElementById("vid");
+
 let photos=[
-  "photo1.jpg","photo2.jpg","photo3.jpg",
-  "photo4.jpg","photo5.jpg","photo6.jpg","photo7.jpg"
+ "photo1.jpg","photo2.jpg","photo3.jpg",
+ "photo4.jpg","photo5.jpg","photo6.jpg","photo7.jpg"
 ];
-let p=0;
 
-const yes=document.getElementById("yes");
-const no=document.getElementById("no");
-const bgm=document.getElementById("bgm");
-const final=document.getElementById("final");
-
-/* YES CLICK */
-yes.onclick=()=>{
-  document.getElementById("step0").classList.add("hidden");
-  bgm.volume=0.6;
-  bgm.play().catch(()=>{});
-  showLine("HAPPY ANNIVERSARY RA ♥️",playVideo);
+/* NO BUTTON – CLICK TO JUMP */
+no.onclick = ()=>{
+  let x = Math.random()*(window.innerWidth-100);
+  let y = Math.random()*(window.innerHeight-60);
+  no.style.left = x+"px";
+  no.style.top  = y+"px";
 };
 
-/* NO BUTTON FULL SCREEN JUMP */
-function moveNo(){
-  let x=Math.random()*(window.innerWidth-100);
-  let y=Math.random()*(window.innerHeight-60);
-  no.style.left=x+"px";
-  no.style.top=y+"px";
-}
-no.addEventListener("mouseenter",moveNo);
-no.addEventListener("touchstart",moveNo);
+/* YES CLICK */
+yes.onclick = ()=>{
+  document.getElementById("step0").classList.add("hidden");
+  bgm.currentTime = 0;
+  bgm.play();
+  showLine("I just want you to see this once 💖", playVideo);
+};
 
 /* SINGLE LINE */
-function showLine(text,done){
-  document.getElementById("step1").classList.remove("hidden");
-  let el=document.getElementById("typing");
-  el.innerHTML="";
+function showLine(text,next){
+  document.getElementById("textScreen").classList.remove("hidden");
+  typing.innerHTML="";
   let i=0;
   let t=setInterval(()=>{
-    el.innerHTML+=text[i++];
+    typing.innerHTML+=text[i++];
     if(i>=text.length){
       clearInterval(t);
-      setTimeout(done,2000);
+      setTimeout(next,2000);
     }
-  },70);
+  },90);
 }
 
 /* VIDEO */
 function playVideo(){
-  document.getElementById("step1").classList.add("hidden");
-  let v=document.getElementById("vid");
-  document.getElementById("videoBox").classList.remove("hidden");
-  v.currentTime=0;
-  v.play();
-  v.onended=()=>{
-    document.getElementById("videoBox").classList.add("hidden");
+  document.getElementById("textScreen").classList.add("hidden");
+  document.getElementById("videoScreen").classList.remove("hidden");
+  vid.currentTime=0;
+  vid.play();
+  vid.onended=()=>{
+    document.getElementById("videoScreen").classList.add("hidden");
     longLines();
   };
 }
@@ -192,44 +181,42 @@ function playVideo(){
 /* MULTI LINES */
 function longLines(){
   let lines=[
-    "156 week's back same day I met this idiot😚🤭...",
-    "Our journey is unbelievable 💌...",
-    "36 months of memories 💕...",
-    "You became my comfort ❤️..."
+    "Every moment with you feels special ❤️",
+    "You became my safe place 💕",
+    "Days turned into beautiful memories ✨",
+    "I choose you every single time ♾️"
   ];
-  typeLines(lines,showPhotos);
+  typeLines(lines, showPhotos);
 }
 
-function typeLines(lines,done){
-  document.getElementById("step1").classList.remove("hidden");
-  let el=document.getElementById("typing");
-  el.innerHTML="";
+function typeLines(lines,next){
+  document.getElementById("textScreen").classList.remove("hidden");
+  typing.innerHTML="";
   let i=0,j=0;
   let int=setInterval(()=>{
-    el.innerHTML+=lines[i][j++];
+    typing.innerHTML+=lines[i][j++];
     if(j>=lines[i].length){
-      el.innerHTML+="<br><br>";
-      i++;j=0;
+      typing.innerHTML+="<br><br>";
+      i++; j=0;
       if(i>=lines.length){
         clearInterval(int);
-        setTimeout(done,2000);
+        setTimeout(next,2000);
       }
     }
-  },60);
+  },80);
 }
 
 /* PHOTOS */
 function showPhotos(){
-  document.getElementById("step1").classList.add("hidden");
-  document.getElementById("photoBox").classList.remove("hidden");
+  document.getElementById("textScreen").classList.add("hidden");
+  document.getElementById("photoScreen").classList.remove("hidden");
   let img=document.getElementById("photo");
-  p=0;
+  let p=0;
   img.src=photos[p];
-  let interval=setInterval(()=>{
+  let slide=setInterval(()=>{
     p++;
     if(p>=photos.length){
-      clearInterval(interval);
-      document.getElementById("photoBox").classList.add("hidden");
+      clearInterval(slide);
       finalLine();
     }else{
       img.src=photos[p];
@@ -239,41 +226,37 @@ function showPhotos(){
 
 /* FINAL LINE */
 function finalLine(){
-  showLine("One last thing... ❤️",showLoading);
+  showLine("One last thing for you ❤️", showLoading);
 }
 
 /* LOADING */
 function showLoading(){
-  document.getElementById("step1").classList.add("hidden");
-  document.getElementById("loadingBox").classList.remove("hidden");
+  document.getElementById("textScreen").classList.add("hidden");
+  document.getElementById("loadingScreen").classList.remove("hidden");
   setTimeout(()=>{
-    document.getElementById("loadingBox").classList.add("hidden");
+    document.getElementById("loadingScreen").classList.add("hidden");
     lastScene();
   },3000);
 }
 
-/* LAST PHOTO + AUDIO */
+/* LAST PHOTO + FINAL AUDIO */
 function lastScene(){
-  let img=document.getElementById("photo");
-  img.src="last.jpg";
-  document.getElementById("photoBox").classList.remove("hidden");
+  document.getElementById("photoScreen").classList.remove("hidden");
+  document.getElementById("photo").src="last.jpg";
   bgm.pause();
+  final.currentTime=0;
   final.play();
-  final.onended=()=>{
-    document.getElementById("photoBox").classList.add("hidden");
-  };
 }
 
-/* ❤️ FLOATING HEARTS */
+/* FLOATING HEARTS */
 setInterval(()=>{
   let h=document.createElement("div");
   h.className="heart";
-  h.innerHTML="💖";
+  h.innerText="💖";
   h.style.left=Math.random()*100+"vw";
-  h.style.fontSize=(15+Math.random()*15)+"px";
   document.body.appendChild(h);
   setTimeout(()=>h.remove(),8000);
-},600);
+},700);
 </script>
 
 </body>
