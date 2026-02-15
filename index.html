@@ -17,7 +17,7 @@ body{
   position:relative;
 }
 
-/* BACKGROUND HEARTS */
+/* HEARTS */
 .heart{
   position:absolute;
   bottom:-20px;
@@ -32,7 +32,7 @@ body{
   to{transform:translateY(-120vh);opacity:0;}
 }
 
-/* COMMON SCREEN */
+/* COMMON */
 .screen{
   width:100%;
   height:100%;
@@ -45,7 +45,6 @@ body{
 }
 .hidden{display:none;}
 
-/* TEXT */
 #typing{
   font-size:18px;
   line-height:1.6;
@@ -70,18 +69,17 @@ button{
 #no{
   background:#555;
   color:#fff;
-  position:fixed; /* REQUIRED for jumping */
+  position:relative;   /* ✅ FIX: no overlap */
 }
 
-/* FULL SCREEN MEDIA – NO ZOOM */
+/* MEDIA */
 video,img{
   width:100vw;
   height:100vh;
-  object-fit:contain;   /* NO ZOOM / NO CUT */
+  object-fit:contain;
   background:black;
 }
 
-/* LOADING */
 #loading{
   font-size:22px;
   color:#3b001f;
@@ -100,61 +98,54 @@ video,img{
   </div>
 </div>
 
-<!-- TEXT -->
 <div id="textScreen" class="screen hidden">
   <div id="typing"></div>
 </div>
 
-<!-- VIDEO -->
 <div id="videoScreen" class="hidden">
   <video id="vid" src="video.mp4"></video>
 </div>
 
-<!-- PHOTOS -->
 <div id="photoScreen" class="hidden">
   <img id="photo">
 </div>
 
-<!-- LOADING -->
 <div id="loadingScreen" class="screen hidden">
   <div id="loading">Loading...</div>
 </div>
 
-<audio id="bgm" src="bgm.mp3" loop preload="auto"></audio>
-<audio id="final" src="final.mp3" preload="auto"></audio>
+<audio id="bgm" src="bgm.mp3" loop></audio>
+<audio id="final" src="final.mp3"></audio>
 
 <script>
-const yes = document.getElementById("yes");
-const no  = document.getElementById("no");
-const bgm = document.getElementById("bgm");
-const final = document.getElementById("final");
-const typing = document.getElementById("typing");
-const vid = document.getElementById("vid");
+const yes=document.getElementById("yes");
+const no=document.getElementById("no");
+const bgm=document.getElementById("bgm");
+const final=document.getElementById("final");
+const typing=document.getElementById("typing");
+const vid=document.getElementById("vid");
 
 let photos=[
  "photo1.jpg","photo2.jpg","photo3.jpg",
  "photo4.jpg","photo5.jpg","photo6.jpg","photo7.jpg"
 ];
 
-/* NO BUTTON – CLICK TO JUMP */
-no.onclick = ()=>{
-  let x = Math.random()*(window.innerWidth-100);
-  let y = Math.random()*(window.innerHeight-60);
-  no.style.left = x+"px";
-  no.style.top  = y+"px";
+/* NO BUTTON CLICK → JUMP */
+no.onclick=()=>{
+  no.style.position="fixed";   // ✅ FIX
+  no.style.left=Math.random()*(innerWidth-100)+"px";
+  no.style.top=Math.random()*(innerHeight-60)+"px";
 };
 
 /* YES CLICK */
-yes.onclick = ()=>{
-  document.getElementById("step0").classList.add("hidden");
-  bgm.currentTime = 0;
+yes.onclick=()=>{
+  step0.classList.add("hidden");
   bgm.play();
   showLine("I just want you to see this once 💖", playVideo);
 };
 
-/* SINGLE LINE */
 function showLine(text,next){
-  document.getElementById("textScreen").classList.remove("hidden");
+  textScreen.classList.remove("hidden");
   typing.innerHTML="";
   let i=0;
   let t=setInterval(()=>{
@@ -166,40 +157,36 @@ function showLine(text,next){
   },90);
 }
 
-/* VIDEO */
 function playVideo(){
-  document.getElementById("textScreen").classList.add("hidden");
-  document.getElementById("videoScreen").classList.remove("hidden");
-  vid.currentTime=0;
+  textScreen.classList.add("hidden");
+  videoScreen.classList.remove("hidden");
   vid.play();
   vid.onended=()=>{
-    document.getElementById("videoScreen").classList.add("hidden");
+    videoScreen.classList.add("hidden");
     longLines();
   };
 }
 
-/* MULTI LINES */
 function longLines(){
   let lines=[
     "Every moment with you feels special ❤️",
     "You became my safe place 💕",
-    "Days turned into beautiful memories ✨",
-    "I choose you every single time ♾️"
+    "Memories I will always keep ✨"
   ];
   typeLines(lines, showPhotos);
 }
 
 function typeLines(lines,next){
-  document.getElementById("textScreen").classList.remove("hidden");
+  textScreen.classList.remove("hidden");
   typing.innerHTML="";
   let i=0,j=0;
-  let int=setInterval(()=>{
+  let t=setInterval(()=>{
     typing.innerHTML+=lines[i][j++];
     if(j>=lines[i].length){
       typing.innerHTML+="<br><br>";
       i++; j=0;
       if(i>=lines.length){
-        clearInterval(int);
+        clearInterval(t);
         setTimeout(next,2000);
       }
     }
@@ -208,47 +195,45 @@ function typeLines(lines,next){
 
 /* PHOTOS */
 function showPhotos(){
-  document.getElementById("textScreen").classList.add("hidden");
-  document.getElementById("photoScreen").classList.remove("hidden");
-  let img=document.getElementById("photo");
+  textScreen.classList.add("hidden");
+  photoScreen.classList.remove("hidden");
+  let img=photo;
   let p=0;
   img.src=photos[p];
   let slide=setInterval(()=>{
     p++;
     if(p>=photos.length){
       clearInterval(slide);
-      finalLine();
-    }else{
-      img.src=photos[p];
-    }
+      afterPhotosLine();
+    }else img.src=photos[p];
   },2000);
 }
 
-/* FINAL LINE */
-function finalLine(){
-  showLine("One last thing for you ❤️", showLoading);
+/* LINE AFTER PHOTOS */
+function afterPhotosLine(){
+  photoScreen.classList.add("hidden");
+  showLine("Just one last moment ❤️", showLoading);
 }
 
 /* LOADING */
 function showLoading(){
-  document.getElementById("textScreen").classList.add("hidden");
-  document.getElementById("loadingScreen").classList.remove("hidden");
+  textScreen.classList.add("hidden");
+  loadingScreen.classList.remove("hidden");
   setTimeout(()=>{
-    document.getElementById("loadingScreen").classList.add("hidden");
+    loadingScreen.classList.add("hidden");
     lastScene();
   },3000);
 }
 
-/* LAST PHOTO + FINAL AUDIO */
+/* LAST */
 function lastScene(){
-  document.getElementById("photoScreen").classList.remove("hidden");
-  document.getElementById("photo").src="last.jpg";
+  photoScreen.classList.remove("hidden");
+  photo.src="last.jpg";
   bgm.pause();
-  final.currentTime=0;
   final.play();
 }
 
-/* FLOATING HEARTS */
+/* HEARTS */
 setInterval(()=>{
   let h=document.createElement("div");
   h.className="heart";
