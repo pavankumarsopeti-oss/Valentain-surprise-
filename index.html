@@ -17,7 +17,7 @@ body{
   position:relative;
 }
 
-/* CENTER */
+/* COMMON SCREEN */
 .screen{
   width:100%;
   height:100%;
@@ -29,6 +29,14 @@ body{
 }
 
 .hidden{display:none;}
+
+/* TEXT */
+#typing{
+  font-size:22px;
+  line-height:1.7;
+  color:#3b001f;
+  max-width:90%;
+}
 
 /* BUTTONS */
 .btn-row{
@@ -52,14 +60,6 @@ button{
   position:absolute;
 }
 
-/* TEXT */
-#typing{
-  max-width:90%;
-  font-size:22px;
-  line-height:1.7;
-  color:#3b001f;
-}
-
 /* VIDEO & IMAGE – NO ZOOM */
 video,img{
   width:100vw;
@@ -68,32 +68,26 @@ video,img{
   background:black;
 }
 
-/* HEARTS */
-.heart{
-  position:absolute;
-  bottom:-20px;
-  animation:float 8s linear infinite;
-  opacity:0.6;
-}
-@keyframes float{
-  from{transform:translateY(0);}
-  to{transform:translateY(-110vh);}
+/* LOADING */
+#loading{
+  font-size:26px;
+  color:#3b001f;
 }
 </style>
 </head>
 
 <body>
 
-<!-- STEP 0 -->
+<!-- STEP 1 : YES NO -->
 <div id="step0" class="screen">
-  <h2>Will you stay till the end? 💖</h2>
+  <h2>This is just for you 💖</h2>
   <div class="btn-row">
     <button id="yes">YES</button>
     <button id="no">NO</button>
   </div>
 </div>
 
-<!-- TEXT -->
+<!-- TEXT SCREEN -->
 <div id="textScreen" class="screen hidden">
   <div id="typing"></div>
 </div>
@@ -103,32 +97,36 @@ video,img{
   <video id="vid" src="video.mp4"></video>
 </div>
 
-<!-- PHOTO -->
+<!-- PHOTOS -->
 <div id="photoScreen" class="hidden">
   <img id="photo">
 </div>
 
-<audio id="bgm" src="bgm.mp3" loop></audio>
-<audio id="final" src="final.mp3"></audio>
+<!-- LOADING -->
+<div id="loadingScreen" class="screen hidden">
+  <div id="loading">Loading...</div>
+</div>
+
+<audio id="bgm" src="bgm.mp3" loop preload="auto"></audio>
+<audio id="final" src="final.mp3" preload="auto"></audio>
 
 <script>
-const yes=document.getElementById("yes");
-const no=document.getElementById("no");
-const bgm=document.getElementById("bgm");
-const final=document.getElementById("final");
-const vid=document.getElementById("vid");
-const typing=document.getElementById("typing");
+const yes = document.getElementById("yes");
+const no = document.getElementById("no");
+const bgm = document.getElementById("bgm");
+const final = document.getElementById("final");
+const vid = document.getElementById("vid");
+const typing = document.getElementById("typing");
 
 let photos=[
  "photo1.jpg","photo2.jpg","photo3.jpg",
  "photo4.jpg","photo5.jpg","photo6.jpg","photo7.jpg"
 ];
-let p=0;
 
 /* NO BUTTON JUMP */
 no.addEventListener("mouseenter",()=>{
-  no.style.left=Math.random()*(window.innerWidth-100)+"px";
-  no.style.top=Math.random()*(window.innerHeight-60)+"px";
+  no.style.left = Math.random()*(window.innerWidth-100)+"px";
+  no.style.top  = Math.random()*(window.innerHeight-60)+"px";
 });
 
 /* YES CLICK */
@@ -136,13 +134,13 @@ yes.onclick=()=>{
   document.getElementById("step0").classList.add("hidden");
 
   bgm.currentTime=0;
-  bgm.play(); // ✅ GUARANTEED PLAY
+  bgm.play(); // ✅ AUDIO FIX
 
-  showLine("I just want you to see this once 💕",playVideo);
+  showLine("I just want you to see this once 💕", playVideo);
 };
 
-/* TYPE LINE */
-function showLine(text,done){
+/* SINGLE LINE */
+function showLine(text, next){
   document.getElementById("textScreen").classList.remove("hidden");
   typing.innerHTML="";
   let i=0;
@@ -150,7 +148,7 @@ function showLine(text,done){
     typing.innerHTML+=text[i++];
     if(i>=text.length){
       clearInterval(t);
-      setTimeout(done,2000);
+      setTimeout(next,2000);
     }
   },90);
 }
@@ -161,28 +159,30 @@ function playVideo(){
   document.getElementById("videoScreen").classList.remove("hidden");
   vid.currentTime=0;
   vid.play();
+
   vid.onended=()=>{
     document.getElementById("videoScreen").classList.add("hidden");
-    longText();
+    longLines();
   };
 }
 
-/* LONG TEXT */
-function longText(){
+/* MULTI LINES */
+function longLines(){
   let lines=[
     "156 weeks ago everything started ❤️",
-    "Our journey is unreal 💕",
-    "36 months of memories 💟",
-    "Still choosing you everyday ✨",
-    "Happy anniversary ♾️"
+    "36 months of memories 💕",
+    "Every day choosing you ✨",
+    "You became my comfort 💖",
+    "Forever kind of feeling ♾️"
   ];
-  typeLines(lines,showPhotos);
+  typeLines(lines, showPhotos);
 }
 
-function typeLines(lines,done){
+function typeLines(lines, next){
   document.getElementById("textScreen").classList.remove("hidden");
   typing.innerHTML="";
   let i=0,j=0;
+
   let int=setInterval(()=>{
     typing.innerHTML+=lines[i][j++];
     if(j>=lines[i].length){
@@ -190,7 +190,7 @@ function typeLines(lines,done){
       i++; j=0;
       if(i>=lines.length){
         clearInterval(int);
-        setTimeout(done,2000);
+        setTimeout(next,2000);
       }
     }
   },80);
@@ -201,38 +201,45 @@ function showPhotos(){
   document.getElementById("textScreen").classList.add("hidden");
   document.getElementById("photoScreen").classList.remove("hidden");
   const img=document.getElementById("photo");
-  p=0;
+  let p=0;
   img.src=photos[p];
 
   let slide=setInterval(()=>{
     p++;
     if(p>=photos.length){
       clearInterval(slide);
-      finalScene();
+      finalLine();
     }else{
       img.src=photos[p];
     }
   },2000);
 }
 
-/* FINAL */
-function finalScene(){
-  const img=document.getElementById("photo");
-  img.src="last.jpg";
-  bgm.pause();
-  final.play();
+/* FINAL LINE */
+function finalLine(){
+  showLine("One last thing for you ❤️", showLoading);
 }
 
-/* HEARTS */
-setInterval(()=>{
-  let h=document.createElement("div");
-  h.className="heart";
-  h.innerHTML="💖";
-  h.style.left=Math.random()*100+"vw";
-  h.style.fontSize=(14+Math.random()*18)+"px";
-  document.body.appendChild(h);
-  setTimeout(()=>h.remove(),8000);
-},800);
+/* LOADING */
+function showLoading(){
+  document.getElementById("photoScreen").classList.add("hidden");
+  document.getElementById("loadingScreen").classList.remove("hidden");
+
+  setTimeout(()=>{
+    document.getElementById("loadingScreen").classList.add("hidden");
+    lastScene();
+  },3000);
+}
+
+/* LAST PHOTO + FINAL AUDIO */
+function lastScene(){
+  document.getElementById("photoScreen").classList.remove("hidden");
+  document.getElementById("photo").src="last.jpg";
+
+  bgm.pause();
+  final.currentTime=0;
+  final.play();
+}
 </script>
 
 </body>
